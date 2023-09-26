@@ -1,0 +1,7 @@
+{
+    "[python]": {
+        "editor.tabSize": 2,
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none",
+}

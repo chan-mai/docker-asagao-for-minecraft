@@ -4,5 +4,13 @@
 	"workspaceFolder": "/workspace",
 	"service": "main",
 	"postCreateCommand": "pip install -r requirements.txt",
-	"remoteUser": "vscode"
+	"remoteUser": "vscode",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.autopep8"
+			]
+		}
+	}
 }
