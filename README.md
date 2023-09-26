@@ -38,7 +38,11 @@ Discordアカウント、ConoHaアカウント(APIアカウント含む)を作�
 
 ## 本リポジトリをデプロイ(サーバーで実行)する
 
-このリポジトリをCloneし、設定完了後、
+このリポジトリをCloneし、
+```
+cp .env.example .env
+```
+を実行し、.envファイルを作成し、設定完了後、
 ```
 docker compose up -d
 ```
