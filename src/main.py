@@ -15,7 +15,7 @@ import datetime
 from config import *
 
 
-client = discord.Client()
+client = discord.Client(intents=discord.Intents.all())
 client.isProcessing = False
 client.channel = None
 

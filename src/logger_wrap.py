@@ -5,7 +5,10 @@ import logging.handlers
 
 def logger(name=''):
   log_path = Path(__file__).parent
-  log_path /= '../log/index.log'
+  log_path /= './log/index.log'
+  # ログファイルがないときにディレクトリを生成
+  if not log_path.parent.exists():
+    log_path.parent.mkdir()
   logger = logging.getLogger(name)
   logger.setLevel(logging.DEBUG)
   rotation_handler = logging.handlers.RotatingFileHandler(
