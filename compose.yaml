@@ -1,0 +1,15 @@
+version: '3'
+services:
+  python3:
+    restart: always
+    build: .
+    container_name: 'asagao-for-minecraft'
+    working_dir: '/app/'
+    tty: true
+    ports:
+      - "80:80"
+    volumes:
+      - ./src/:/app
+      # - /mnt/data:/app/static/
+    env_file:
+      - .env
