@@ -15,7 +15,7 @@ import datetime
 from config import *
 
 
-client = discord.Client()
+client = discord.Client(intents=discord.Intents.all())
 client.isProcessing = False
 client.channel = None
 
@@ -67,31 +67,41 @@ async def on_message(_message):
     return
 
   channel = _message.channel
+  content = _message.content
+  print(content)
 
-  if _message.content in utility.full_commands('open'):
+  if content in utility.full_commands('open'):
+    print('open')
     await open_vm(channel)
 
-  if _message.content in utility.full_commands('close'):
+  elif content in utility.full_commands('close'):
+    print('close')
     await close_vm(channel)
 
-  if _message.content in utility.full_commands('help'):
+  elif content in utility.full_commands('help'):
+    print('help')
     await utility.post_asagao_minecraft_commands(channel)
 
-  if _message.content in utility.full_commands('plan'):
+  elif content in utility.full_commands('plan'):
+    print('plan')
     await conoha_sub.post_discord_conoha_vm_plans(channel)
 
-  if _message.content in utility.full_commands(['myid', 'userid']):
+  elif content in utility.full_commands(['myid', 'userid']):
+    print('myid')
     await utility.post_user_id(_message)
 
-  if _message.content in utility.full_commands('version'):
+  elif content in utility.full_commands('version'):
+    print('version')
     await utility.post_version(channel)
 
-  if _message.content in utility.full_commands('open_and_close'):
+  elif content in utility.full_commands('open_and_close'):
+    print('open_and_close')
     await open_vm(channel)
     time.sleep(10)
     await close_vm(channel)
 
   if ALLOW_PROCESS_KILL_COMMAND:
+    print('exit')
     if _message.content in utility.full_commands('exit'):
       await utility.post_embed_complite(channel, 'exit', 'python process is finished.')
       sys.exit()
