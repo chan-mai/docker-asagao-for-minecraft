@@ -1,12 +1,7 @@
-# python3 -m pip install -U discord.py
-# pip install requests
-
 import sys
 import time
 import discord
 from discord.ext import tasks
-import requests
-import json
 import conoha_wrap
 import conoha_main
 import conoha_sub
@@ -20,11 +15,15 @@ client.isProcessing = False
 client.channel = None
 
 # 起動時
+
+
 @client.event
 async def on_ready():
   print('discord login')
   if HOUR_FOR_IMAGE_LEAVE_ALONE_LONG_TIME != '':
-    client.channel = discord.utils.get(client.get_all_channels(), name=DISCORD_CHANNEL_NAMES[0])
+    client.channel = discord.utils.get(
+      client.get_all_channels(), name=DISCORD_CHANNEL_NAMES[0]
+    )
     sidekiq.start()
 
 
@@ -63,7 +62,7 @@ async def close_vm(_channel):
 # メッセージ受信時
 @client.event
 async def on_message(_message):
-  if _message.author.bot or not(_message.channel.name in DISCORD_CHANNEL_NAMES):
+  if _message.author.bot or not (_message.channel.name in DISCORD_CHANNEL_NAMES):
     return
 
   channel = _message.channel
