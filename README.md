@@ -4,6 +4,8 @@
 
 
 # はじめに
+これは[yosipyさん](https://github.com/yosipy)が作成した[asagao-for-minecraft](https://github.com/yosipy/asagao-for-minecraft)をDockerへ移植し、正常に動作するよう一部動作を変更したものです。  
+
 
 ## asagao-for-minecraftとは
 
@@ -34,25 +36,14 @@ asagao-for-minecraftもConoHaのVMを構築し、破棄します。
 
 Discordアカウント、ConoHaアカウント(APIアカウント含む)を作成している前提とします。
 
-## 本リポジトリをデプロイ(サーバーに公開して実行)する
+## 本リポジトリをデプロイ(サーバーで実行)する
 
-このリポジトリをCloneしてきてPythonの動くサーバーにデプロイします。
-環境はレンタルサーバー、クラウドなどがいいと思います。
-
-個人的にロリポップマネージドクラウドで運用しているので、他の環境での検証は行っていません。
-その他の環境で試してみた情報がございましたら、PR、Issue、ご自身のブログ等で共有いただけますと助かります。
-他の環境で動かすために新しくコードが必要になるかもしれません。
-
-最近、HerokuのFreeプランでは24時間の運用ができなくなったので難しいかもしれません(ボットを動かす前にサイトにアクセスする等でHerokuコンテナを起こすなどの工夫がいると思われます)。
-レンタルサーバーなど、環境変数の使えない環境では仮想的に環境変数を取り扱ったり、ソースコードに直接トークンなどの情報を入れるしか方法はないと思います(トークンをGithubにアップロードしないように注意してください。また、ソースコードに直接トークンなどの秘匿情報を書くのはセキュリティ的にお行儀が良くない気がしてます)。
-
-Python 3.5.3より新しいバージョンである必要があります。
-
-以下のコマンドでPythonの必要なライブラリをインポートしてください。そして本リポジトリをデプロイしてください。
+このリポジトリをCloneし、設定完了後、
 ```
-python3 -m pip install -U discord.py
-pip install requests
+docker compose up -d
 ```
+を実行するだけです。
+
 
 ## DiscordBotの設定を行う
 
@@ -66,6 +57,9 @@ pip install requests
 1. 「settings」->「OAuth2」->「OAuth2 URL Generator」->「SCOPES」の「bot」にチェックを入れます。認証URLが生成されるのでアクセスし、使いたいサーバーを選択して、「認証」します。
 
 これでDiscordアプリから作ったBotアカウントを確認できると思います。
+
+2023.9現在、DiscordAPIの仕様変更に伴い、DeveloperPortalよりINTENT権限を許可する必要があります。  
+「Bot」メニュー内の「PRESENCE INTENT」「SERVER MEMBERS INTENT」「MESSAGE CONTENT INTENT」を許可します。
 
 ## 環境変数に値を設定する
 
@@ -96,43 +90,11 @@ DISCORD_CHANNEL_NAMESは`/mc`コマンドを実行できるDiscordチャンネ�
   - CONOHA_API_COMPUTE_SERVICE
   - CONOHA_API_NETWORK_SERVICE
   - CONOHA_API_VM_PLAN_FLAVOR_UUID
+  - DISCORD_CHANNEL_NAMES
 - オプション環境変数
   - VM_AND_IMAGE_NAME
   - ADMIN_USER_ID
-  - DISCORD_CHANNEL_NAMES
-
-<!---
-<details><summary>※環境変数を使えない環境で必要なパラメーターを設定する</summary><div>
-
-`env.json`というファイル名で以下のファイルを作成し、上記を参考に値を入力したのちに、ssh接続などでサーバーの`main.py`と同じ階層にファイルをおいてください。
-(もしくはssh接続でファイルを作成したのちに、vimなどで以下の内容を入力してもいいと思います)
-※絶対に`env.json`をGitで管理しないでください。Tokenなどの情報をGithubの公開リポジトリなどにアップロードしてしまうと、不正利用される恐れがあります。
-
-```
-{
-  "DISCORD_TOKEN": "",
-  "CONOHA_API_TENANT_ID": "",
-  "CONOHA_API_IDENTITY_SERVICE": "",
-  "CONOHA_API_USER_NAME": "",
-  "CONOHA_API_USER_PASSWORD": "",
-
-  "CONOHA_API_IMAGE_SERVICE": "",
-  "CONOHA_API_COMPUTE_SERVICE": "",
-  "CONOHA_API_NETWORK_SERVICE": "",
-  "CONOHA_API_VM_PLAN_FLAVOR_UUID": "",
-
-
-  "VM_AND_IMAGE_NAME": "",
-  "ADMIN_USER_ID": "",
-  "DISCORD_CHANNEL_NAMES": ""
-}
-
-```
-
-`env.json`がリポジトリのルートにあると、環境変数より優先してそちらの値を使用します。
-
-</div></details>
--->
+  - HOUR_FOR_IMAGE_LEAVE_ALONE_LONG_TIME
 
 ## ConoHaでMinecraft用のVMを作成する
 
@@ -189,15 +151,6 @@ VMを再作成している仕様上、毎回サーバーのipアドレスは変�
 安定してきたら、そのうち30日ごとに自動で`/mc open`と`/mc close`を行うようにしたいと思ってます。
 
 
-## α版って感じです
-
-※現在α版って感じです(厳密に決めてないですが)。
-
-使用に関して一切責任は負いかねます。すべて自己責任でお願いします。
-
-ConoHaの課金はクレジットカードでなく、チャージ式のほうが安心な気がしてます。
-
-
 # Tokenなどの情報管理に気を付けてください
 
 TokenやパスワードをGitで管理しないでください。
@@ -224,6 +177,3 @@ imageやVMを削除する前にその両方が有効な状態かチェックし�
 imageの判別にはimageの名前(name)、VMの判別にはVMのネームタグ(instance_name_tag)を使用しています。同じものを複数作成しないでください。
 
 asagao-for-minecraftは[discord.py](https://github.com/Rapptz/discord.py)とConoHaAPIを用いています。アイコンの作成には[Textcraft](https://textcraft.net/)を使用しています。
-
-
-<!-- 製作者はロリポップマネージドクラウド、Minecraft Java edition で使用してます。 -->
