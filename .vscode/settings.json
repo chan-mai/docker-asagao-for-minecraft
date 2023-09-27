@@ -1,0 +1,12 @@
+{
+    "[python]": {
+        "editor.tabSize": 2,
+        "editor.defaultFormatter": "ms-python.autopep8",
+    },
+    "autopep8.args": [
+        "--max-line-length",
+        "150",
+        "--indent-size=2",
+    ],
+    "python.analysis.typeCheckingMode": "off",
+}
