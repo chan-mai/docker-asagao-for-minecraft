@@ -1,4 +1,3 @@
-import sys
 import time
 from typing import Any
 import discord
@@ -75,11 +74,11 @@ def check_channel_name(_channel_name):
 
 
 # Minecraftサーバー起動コマンド
-@client.tree.add_command(
+@client.tree.command(
     name="open",
     description="Create VM from image, for play minecraft.",
-    guilds=DISCORD_GUILD_IDS
 )
+@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
 @discord.app_commands.guild_only()
 async def open(interaction: discord.Interaction):
   if check_channel_name(interaction.channel.name) == False:
@@ -94,11 +93,11 @@ async def open(interaction: discord.Interaction):
 
 
 # Minecraftサーバー停止コマンド
-@client.tree.add_command(
+@client.tree.command(
     name="close",
     description="Delete VM and save image, finished play minecraft.",
-    guilds=DISCORD_GUILD_IDS
 )
+@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
 @discord.app_commands.guild_only()
 async def close(interaction: discord.Interaction):
   if check_channel_name(interaction.channel.name) == False:
@@ -113,11 +112,11 @@ async def close(interaction: discord.Interaction):
 
 
 # helpコマンド
-@client.tree.add_command(
+@client.tree.command(
     name="help",
     description="help.",
-    guilds=DISCORD_GUILD_IDS
 )
+@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
 @discord.app_commands.guild_only()
 async def help(interaction: discord.Interaction):
   if check_channel_name(interaction.channel.name) == False:
@@ -131,11 +130,11 @@ async def help(interaction: discord.Interaction):
 
 
 # conoha vm plansコマンド
-@client.tree.add_command(
+@client.tree.command(
     name="plan",
     description="ConoHa vm plans list.",
-    guilds=DISCORD_GUILD_IDS
 )
+@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
 @discord.app_commands.guild_only()
 async def plan(interaction: discord.Interaction):
   if check_channel_name(interaction.channel.name) == False:
@@ -149,11 +148,11 @@ async def plan(interaction: discord.Interaction):
 
 
 # myidコマンド
-@client.tree.add_command(
+@client.tree.command(
     name="myid",
     description="user id.",
-    guilds=DISCORD_GUILD_IDS
 )
+@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
 @discord.app_commands.guild_only()
 async def myid(interaction: discord.Interaction):
   if check_channel_name(interaction.channel.name) == False:
@@ -167,11 +166,11 @@ async def myid(interaction: discord.Interaction):
 
 
 # versionコマンド
-@client.tree.add_command(
+@client.tree.command(
     name="version",
     description="asagao-for-minecraft version.",
-    guilds=DISCORD_GUILD_IDS
 )
+@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
 @discord.app_commands.guild_only()
 async def version(interaction: discord.Interaction):
   if check_channel_name(interaction.channel.name) == False:
@@ -185,11 +184,11 @@ async def version(interaction: discord.Interaction):
 
 
 # open_and_closeコマンド
-@client.tree.add_command(
+@client.tree.command(
     name="open_and_close",
     description="Create VM from image, for play minecraft.\nDelete VM and save image, finished play minecraft.",
-    guilds=DISCORD_GUILD_IDS
 )
+@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
 @discord.app_commands.guild_only()
 async def open_and_close(interaction: discord.Interaction):
   if check_channel_name(interaction.channel.name) == False:
