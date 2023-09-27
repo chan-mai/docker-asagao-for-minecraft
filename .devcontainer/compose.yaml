@@ -6,5 +6,5 @@ services:
     stdin_open: true
     volumes:
       - ..:/workspace:cached
-    env_file:
-      - ../.env
+    #env_file:
+    #  - ../.env
