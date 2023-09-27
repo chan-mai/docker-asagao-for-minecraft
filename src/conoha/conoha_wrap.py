@@ -1,12 +1,10 @@
 import sys
-import time
-import discord
 import datetime
 import requests
 import json
-import utility
+import utils.utility as utility
 from config import *
-import logger_wrap
+import utils.logger_wrap as logger_wrap
 
 logger = logger_wrap.logger(__name__)
 
@@ -169,10 +167,9 @@ async def is_should_close(_channel):
   created_date, created_time = created_at.split('T')
   created_date = created_date.split('-')
   created_date = datetime.date(int(created_date[0]), int(created_date[1]), int(created_date[2]))
-
   today = datetime.date.today()
 
-  if (created_date + datetime.timedelta(days=1)) < datetime.date.today():
+  if (created_date + datetime.timedelta(days=1)) < today:
     return True
 
   return False
