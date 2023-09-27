@@ -21,7 +21,7 @@ VM_AND_IMAGE_NAME = 'asagao-for-minecraft-' + \
     os.environ.get('VM_AND_IMAGE_NAME', '') if os.environ.get('VM_AND_IMAGE_NAME', '') != '' else 'asagao-for-minecraft'
 ADMIN_USER_ID = os.environ.get('ADMIN_USER_ID', '')
 DISCORD_CHANNEL_NAMES = os.environ.get('DISCORD_CHANNEL_NAMES', 'minecraft, minecraft-test').replace(' ', '').split(',')
-DISCORD_GUILD_IDS = list(map(int, os.environ.get('DISCORD_GUILD_IDS', '').replace(' ', '').split(',')))
+DISCORD_GUILD_IDS = tuple(map(int, os.environ.get('DISCORD_GUILD_IDS', '').replace(' ', '').split(',')))
 
 # secret
 HOUR_FOR_IMAGE_LEAVE_ALONE_LONG_TIME = os.environ.get('HOUR_FOR_IMAGE_LEAVE_ALONE_LONG_TIME', None)
