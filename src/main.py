@@ -1,16 +1,26 @@
 import sys
 import time
+from typing import Any
 import discord
+from discord import app_commands
 from discord.ext import tasks
+from discord.flags import Intents
 from conoha import conoha_wrap, conoha_main, conoha_sub
 import utils.utility as utility
 import datetime
 from config import *
 
 
-client = discord.Client(intents=discord.Intents.all())
-client.isProcessing = False
-client.channel = None
+class Client(discord.Client):
+  def __init__(self, *, intents: Intents, **options: Any) -> None:
+    super().__init__(intents=intents, **options)
+    self.isProcessing: bool = False
+    self.channel = None
+    # SlashCommand用にコマンドツリーを定義
+    self.tree = app_commands.CommandTree(self)
+
+
+client = Client(intents=discord.Intents.all())
 
 # 起動時
 
@@ -57,50 +67,141 @@ async def close_vm(_channel):
   client.isProcessing = False
 
 
-# メッセージ受信時
-@client.event
-async def on_message(_message):
-  if _message.author.bot or not (_message.channel.name in DISCORD_CHANNEL_NAMES):
-    return
+def check_channel_name(_channel_name):
+  if _channel_name in DISCORD_CHANNEL_NAMES:
+    return True
+  else:
+    return False
 
-  channel = _message.channel
-  content = _message.content
-  print(content)
 
-  if content in utility.full_commands('open'):
-    print('open')
-    await open_vm(channel)
+# Minecraftサーバー起動コマンド
+@client.tree.add_command(
+    name="open",
+    description="Create VM from image, for play minecraft.",
+    guilds=DISCORD_GUILD_IDS
+)
+@discord.app_commands.guild_only()
+async def open(interaction: discord.Interaction):
+  if check_channel_name(interaction.channel.name) == False:
+    await interaction.response.send_message(
+        'This command is not available in this channel.',
+        ephemeral=True,
+    )
+    return None
+  await interaction.response.send_message('starting open vm...')
+  print('open')
+  await open_vm(interaction.channel)
 
-  elif content in utility.full_commands('close'):
-    print('close')
-    await close_vm(channel)
 
-  elif content in utility.full_commands('help'):
-    print('help')
-    await utility.post_asagao_minecraft_commands(channel)
+# Minecraftサーバー停止コマンド
+@client.tree.add_command(
+    name="close",
+    description="Delete VM and save image, finished play minecraft.",
+    guilds=DISCORD_GUILD_IDS
+)
+@discord.app_commands.guild_only()
+async def close(interaction: discord.Interaction):
+  if check_channel_name(interaction.channel.name) == False:
+    await interaction.response.send_message(
+        'This command is not available in this channel.',
+        ephemeral=True,
+    )
+    return None
+  await interaction.response.send_message('starting close vm...')
+  print('close')
+  await close_vm(interaction.channel)
 
-  elif content in utility.full_commands('plan'):
-    print('plan')
-    await conoha_sub.post_discord_conoha_vm_plans(channel)
 
-  elif content in utility.full_commands(['myid', 'userid']):
-    print('myid')
-    await utility.post_user_id(_message)
+# helpコマンド
+@client.tree.add_command(
+    name="help",
+    description="help.",
+    guilds=DISCORD_GUILD_IDS
+)
+@discord.app_commands.guild_only()
+async def help(interaction: discord.Interaction):
+  if check_channel_name(interaction.channel.name) == False:
+    await interaction.response.send_message(
+        'This command is not available in this channel.',
+        ephemeral=True,
+    )
+    return None
+  print('help')
+  await utility.post_asagao_minecraft_commands(interaction.channel)
 
-  elif content in utility.full_commands('version'):
-    print('version')
-    await utility.post_version(channel)
 
-  elif content in utility.full_commands('open_and_close'):
-    print('open_and_close')
-    await open_vm(channel)
-    time.sleep(10)
-    await close_vm(channel)
+# conoha vm plansコマンド
+@client.tree.add_command(
+    name="plan",
+    description="ConoHa vm plans list.",
+    guilds=DISCORD_GUILD_IDS
+)
+@discord.app_commands.guild_only()
+async def plan(interaction: discord.Interaction):
+  if check_channel_name(interaction.channel.name) == False:
+    await interaction.response.send_message(
+        'This command is not available in this channel.',
+        ephemeral=True,
+    )
+    return None
+  print('plan')
+  await conoha_sub.post_discord_conoha_vm_plans(interaction.channel)
 
-  if ALLOW_PROCESS_KILL_COMMAND:
-    print('exit')
-    if _message.content in utility.full_commands('exit'):
-      await utility.post_embed_complite(channel, 'exit', 'python process is finished.')
-      sys.exit()
+
+# myidコマンド
+@client.tree.add_command(
+    name="myid",
+    description="user id.",
+    guilds=DISCORD_GUILD_IDS
+)
+@discord.app_commands.guild_only()
+async def myid(interaction: discord.Interaction):
+  if check_channel_name(interaction.channel.name) == False:
+    await interaction.response.send_message(
+        'This command is not available in this channel.',
+        ephemeral=True,
+    )
+    return None
+  print('myid')
+  await utility.post_user_id(interaction)
+
+
+# versionコマンド
+@client.tree.add_command(
+    name="version",
+    description="asagao-for-minecraft version.",
+    guilds=DISCORD_GUILD_IDS
+)
+@discord.app_commands.guild_only()
+async def version(interaction: discord.Interaction):
+  if check_channel_name(interaction.channel.name) == False:
+    await interaction.response.send_message(
+        'This command is not available in this channel.',
+        ephemeral=True,
+    )
+    return None
+  print('version')
+  await utility.post_version(interaction.channel)
+
+
+# open_and_closeコマンド
+@client.tree.add_command(
+    name="open_and_close",
+    description="Create VM from image, for play minecraft.\nDelete VM and save image, finished play minecraft.",
+    guilds=DISCORD_GUILD_IDS
+)
+@discord.app_commands.guild_only()
+async def open_and_close(interaction: discord.Interaction):
+  if check_channel_name(interaction.channel.name) == False:
+    await interaction.response.send_message(
+        'This command is not available in this channel.',
+        ephemeral=True,
+    )
+    return None
+  print('open_and_close')
+  await open_vm(interaction.channel)
+  time.sleep(10)
+  await close_vm(interaction.channel)
+
 
 client.run(DISCORD_TOKEN)
