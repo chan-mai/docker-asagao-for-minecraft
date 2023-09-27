@@ -1,35 +1,30 @@
 import time
-from typing import Any
 import discord
-from discord import app_commands
-from discord.ext import tasks
-from discord.flags import Intents
+from discord.ext import tasks, commands
 from conoha import conoha_wrap, conoha_main, conoha_sub
 import utils.utility as utility
 import datetime
 from config import *
 
-
-class Client(discord.Client):
-  def __init__(self, *, intents: Intents, **options: Any) -> None:
-    super().__init__(intents=intents, **options)
-    self.isProcessing: bool = False
+class Bot(commands.AutoShardedBot):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.isProcessing = False
     self.channel = None
-    # SlashCommand用にコマンドツリーを定義
-    self.tree = app_commands.CommandTree(self)
 
-
-client = Client(intents=discord.Intents.all())
+intents = discord.Intents.default()
+intents.guilds = True
+bot = Bot(intents=discord.Intents.all(), debug_guilds=DISCORD_GUILD_IDS)
 
 # 起動時
 
 
-@client.event
+@bot.event
 async def on_ready():
   print('discord login')
   if HOUR_FOR_IMAGE_LEAVE_ALONE_LONG_TIME != '':
-    client.channel = discord.utils.get(
-        client.get_all_channels(), name=DISCORD_CHANNEL_NAMES[0]
+    bot.channel = discord.utils.get(
+        bot.get_all_channels(), name=DISCORD_CHANNEL_NAMES[0]
     )
     sidekiq.start()
 
@@ -39,9 +34,9 @@ if HOUR_FOR_IMAGE_LEAVE_ALONE_LONG_TIME != '':
   @tasks.loop(minutes=60)
   async def sidekiq():
     if datetime.datetime.now().strftime('%H') == '19-9':
-      is_should_open_and_close = await conoha_wrap.is_should_open_and_close(client.channel)
+      is_should_open_and_close = await conoha_wrap.is_should_open_and_close(bot.channel)
       if is_should_open_and_close:
-        await utility.post_embed_failed(client.channel, f"expiration date warninig:\n\
+        await utility.post_embed_failed(bot.channel, f"expiration date warninig:\n\
           <@{ADMIN_USER_ID}>\n\
           It's been 30 days since last created the Image.\n\
           Please run this command:\n\
@@ -49,21 +44,21 @@ if HOUR_FOR_IMAGE_LEAVE_ALONE_LONG_TIME != '':
 
 
 async def open_vm(_channel):
-  if client.isProcessing:
+  if bot.isProcessing:
     await utility.post_embed_failed(_channel, f"You can only run one at a time.\nCanceled: {utility.full_commands('open')}")
     return None
-  client.isProcessing = True
+  bot.isProcessing = True
   await conoha_main.create_vm_from_image(_channel)
-  client.isProcessing = False
+  bot.isProcessing = False
 
 
 async def close_vm(_channel):
-  if client.isProcessing:
+  if bot.isProcessing:
     await utility.post_embed_failed(_channel, f"You can only run one at a time.\nCanceled: {utility.full_commands('close')}")
     return None
-  client.isProcessing = True
+  bot.isProcessing = True
   await conoha_main.create_image_from_vm(_channel)
-  client.isProcessing = False
+  bot.isProcessing = False
 
 
 def check_channel_name(_channel_name):
@@ -74,13 +69,12 @@ def check_channel_name(_channel_name):
 
 
 # Minecraftサーバー起動コマンド
-@client.tree.command(
+@bot.slash_command(
     name="open",
     description="Create VM from image, for play minecraft.",
 )
-@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
-@discord.app_commands.guild_only()
-async def open(interaction: discord.Interaction):
+async def open(ctx: discord.ApplicationContext):
+  interaction = ctx.interaction
   if check_channel_name(interaction.channel.name) == False:
     await interaction.response.send_message(
         'This command is not available in this channel.',
@@ -93,13 +87,12 @@ async def open(interaction: discord.Interaction):
 
 
 # Minecraftサーバー停止コマンド
-@client.tree.command(
+@bot.slash_command(
     name="close",
     description="Delete VM and save image, finished play minecraft.",
 )
-@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
-@discord.app_commands.guild_only()
-async def close(interaction: discord.Interaction):
+async def close(ctx: discord.ApplicationContext):
+  interaction = ctx.interaction
   if check_channel_name(interaction.channel.name) == False:
     await interaction.response.send_message(
         'This command is not available in this channel.',
@@ -112,13 +105,12 @@ async def close(interaction: discord.Interaction):
 
 
 # helpコマンド
-@client.tree.command(
+@bot.slash_command(
     name="help",
     description="help.",
 )
-@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
-@discord.app_commands.guild_only()
-async def help(interaction: discord.Interaction):
+async def help(ctx: discord.ApplicationContext):
+  interaction = ctx.interaction
   if check_channel_name(interaction.channel.name) == False:
     await interaction.response.send_message(
         'This command is not available in this channel.',
@@ -126,71 +118,35 @@ async def help(interaction: discord.Interaction):
     )
     return None
   print('help')
-  await utility.post_asagao_minecraft_commands(interaction.channel)
-
+  embed = await utility.create_help_embed()
+  await interaction.response.send_message(embed=embed)
 
 # conoha vm plansコマンド
-@client.tree.command(
+@bot.slash_command(
     name="plan",
     description="ConoHa vm plans list.",
 )
-@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
-@discord.app_commands.guild_only()
-async def plan(interaction: discord.Interaction):
+async def plan(ctx: discord.ApplicationContext):
+  interaction = ctx.interaction
   if check_channel_name(interaction.channel.name) == False:
     await interaction.response.send_message(
         'This command is not available in this channel.',
         ephemeral=True,
     )
     return None
+  await interaction.response.defer()
   print('plan')
-  await conoha_sub.post_discord_conoha_vm_plans(interaction.channel)
 
-
-# myidコマンド
-@client.tree.command(
-    name="myid",
-    description="user id.",
-)
-@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
-@discord.app_commands.guild_only()
-async def myid(interaction: discord.Interaction):
-  if check_channel_name(interaction.channel.name) == False:
-    await interaction.response.send_message(
-        'This command is not available in this channel.',
-        ephemeral=True,
-    )
-    return None
-  print('myid')
-  await utility.post_user_id(interaction)
-
-
-# versionコマンド
-@client.tree.command(
-    name="version",
-    description="asagao-for-minecraft version.",
-)
-@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
-@discord.app_commands.guild_only()
-async def version(interaction: discord.Interaction):
-  if check_channel_name(interaction.channel.name) == False:
-    await interaction.response.send_message(
-        'This command is not available in this channel.',
-        ephemeral=True,
-    )
-    return None
-  print('version')
-  await utility.post_version(interaction.channel)
-
+  embed = await conoha_sub.create_conoha_vm_plans_embed(interaction.channel)
+  await interaction.followup.send(embed=embed)
 
 # open_and_closeコマンド
-@client.tree.command(
+@bot.slash_command(
     name="open_and_close",
     description="Create VM from image, for play minecraft.\nDelete VM and save image, finished play minecraft.",
 )
-@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
-@discord.app_commands.guild_only()
-async def open_and_close(interaction: discord.Interaction):
+async def open_and_close(ctx: discord.ApplicationContext):
+  interaction = ctx.interaction
   if check_channel_name(interaction.channel.name) == False:
     await interaction.response.send_message(
         'This command is not available in this channel.',
@@ -203,4 +159,4 @@ async def open_and_close(interaction: discord.Interaction):
   await close_vm(interaction.channel)
 
 
-client.run(DISCORD_TOKEN)
+bot.run(DISCORD_TOKEN)

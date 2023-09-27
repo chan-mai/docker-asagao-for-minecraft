@@ -62,10 +62,12 @@ async def create_vm_from_image(_channel):
   }
   try:
     response = requests.post(CONOHA_API_COMPUTE_SERVICE+'/servers', data=json.dumps(data), headers=headers)
+    response_json = response.json()
+    key = next(iter(response_json))
     if response.status_code == 202:
       await utility.post_message(_channel, '> Success: Create VM.')
     else:
-      await utility.post_embed_failed(_channel, f'get CONOHA_API_COMPUTE_SERVICE/servers: {response.status_code}.')
+      await utility.post_embed_failed(_channel, f'get CONOHA_API_COMPUTE_SERVICE/servers: {response.status_code}\nsmessage: {response_json[key]["message"]}.')
       return None
   except requests.exceptions.RequestException as e:
     await utility.post_embed_failed(_channel, 'get CONOHA_API_COMPUTE_SERVICE/servers: RequestException.')
