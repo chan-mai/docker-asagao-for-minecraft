@@ -2,3 +2,4 @@ src/__pycache__
 log
 env.json
 .env
+*.pyc
