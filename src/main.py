@@ -73,7 +73,6 @@ def check_channel_name(_channel_name):
 @bot.slash_command(
     name="open",
     description="Create VM from image, for play minecraft.",
-    guilds=DISCORD_GUILD_IDS
 )
 async def open(ctx: discord.ApplicationContext):
   interaction = ctx.interaction
@@ -92,7 +91,6 @@ async def open(ctx: discord.ApplicationContext):
 @bot.slash_command(
     name="close",
     description="Delete VM and save image, finished play minecraft.",
-    guilds=DISCORD_GUILD_IDS
 )
 async def close(ctx: discord.ApplicationContext):
   interaction = ctx.interaction
@@ -111,7 +109,6 @@ async def close(ctx: discord.ApplicationContext):
 @bot.slash_command(
     name="help",
     description="help.",
-    guilds=DISCORD_GUILD_IDS
 )
 async def help(ctx: discord.ApplicationContext):
   interaction = ctx.interaction
@@ -129,7 +126,6 @@ async def help(ctx: discord.ApplicationContext):
 @bot.slash_command(
     name="plan",
     description="ConoHa vm plans list.",
-    guilds=DISCORD_GUILD_IDS
 )
 async def plan(ctx: discord.ApplicationContext):
   interaction = ctx.interaction
@@ -146,13 +142,10 @@ async def plan(ctx: discord.ApplicationContext):
   await interaction.followup.send(embed=embed)
 
 # open_and_closeコマンド
-@client.tree.command(
+@bot.slash_command(
     name="open_and_close",
     description="Create VM from image, for play minecraft.\nDelete VM and save image, finished play minecraft.",
-    guilds=DISCORD_GUILD_IDS
 )
-@discord.app_commands.guilds(*DISCORD_GUILD_IDS)
-@discord.app_commands.guild_only()
 async def open_and_close(interaction: discord.Interaction):
   if check_channel_name(interaction.channel.name) == False:
     await interaction.response.send_message(
