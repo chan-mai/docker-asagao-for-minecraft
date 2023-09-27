@@ -1,6 +1,6 @@
 import requests
 import json
-import conoha_wrap
+import conoha.conoha_wrap as conoha_wrap
 import utils.utility as utility
 from config import *
 
