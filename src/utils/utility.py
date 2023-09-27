@@ -1,12 +1,7 @@
-import sys
-import os
-import time
-import asyncio
 import discord
-import requests
 import json
 from config import *
-import logger_wrap
+import utils.logger_wrap as logger_wrap
 
 logger = logger_wrap.logger(__name__)
 
@@ -17,7 +12,7 @@ def full_commands(_commands2):
   elif type(_commands2) == int or type(_commands2) == float:
     _commands2 = [str(_commands2)]
   command1 = ['/mc', '/minecraft']
-  return [f'{c1} {c2}' for c1 in command1 for c2 in _commands2] # ex: ['/mc open', '/minecraft open']
+  return [f'{c1} {c2}' for c1 in command1 for c2 in _commands2]  # ex: ['/mc open', '/minecraft open']
 
 
 def parse_json(_json):
@@ -33,7 +28,7 @@ async def post_message(_channel,  _content):
 
 
 async def post_embed(_channel, _title='', _content='', _color=discord.Color.default):
-  embed = discord.Embed(title=_title,description=_content, color=_color)
+  embed = discord.Embed(title=_title, description=_content, color=_color)
   await _channel.send(embed=embed)
 
 
@@ -52,6 +47,7 @@ async def post_embed_failed(_channel, _content):
     Failed\n\
     {_content}')
 
+
 async def post_embed_error(_channel, _content):
   _content = _content + f'\n\
     Stop asagao-minecraft server.\n\
@@ -62,6 +58,7 @@ async def post_embed_error(_channel, _content):
   logger.error(f'post_embed_error\n\
     Error\n\
     {_content}')
+
 
 async def post_user_id(_message):
   channel = _message.channel
