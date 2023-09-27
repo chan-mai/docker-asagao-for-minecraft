@@ -2,10 +2,8 @@ import sys
 import time
 import discord
 from discord.ext import tasks
-import conoha_wrap
-import conoha_main
-import conoha_sub
-import utility
+from conoha import conoha_wrap, conoha_main, conoha_sub
+import utils.utility as utility
 import datetime
 from config import *
 
@@ -22,7 +20,7 @@ async def on_ready():
   print('discord login')
   if HOUR_FOR_IMAGE_LEAVE_ALONE_LONG_TIME != '':
     client.channel = discord.utils.get(
-      client.get_all_channels(), name=DISCORD_CHANNEL_NAMES[0]
+        client.get_all_channels(), name=DISCORD_CHANNEL_NAMES[0]
     )
     sidekiq.start()
 
