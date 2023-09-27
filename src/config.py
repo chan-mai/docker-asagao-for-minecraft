@@ -1,5 +1,4 @@
 import os
-import json
 
 # Fixed value
 VERSION = '0.1.2'
