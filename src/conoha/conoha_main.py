@@ -1,7 +1,7 @@
 import time
 import requests
 import json
-import conoha.conoha_wrap as conoha_wrap
+import conoha_wrap
 import utils.utility as utility
 from config import *
 import utils.logger_wrap as logger_wrap
@@ -44,21 +44,21 @@ async def create_vm_from_image(_channel):
     return None
   headers = {'Accept': 'application/json', 'X-Auth-Token': conoha_api_token}
   data = {
-      'server': {
-          'imageRef': image['id'],
-          'flavorRef': CONOHA_API_VM_PLAN_FLAVOR_UUID,
-          'security_groups': [
-              {
-                  'name': 'default'
-              },
-              {
-                  'name': 'gncs-ipv4-all'
-              }
-          ],
-          'metadata': {
-              'instance_name_tag': VM_AND_IMAGE_NAME
-          }
+    'server': {
+      'imageRef': image['id'],
+      'flavorRef': CONOHA_API_VM_PLAN_FLAVOR_UUID,
+      'security_groups': [
+        {
+          'name': 'default'
+        },
+        {
+          'name': 'gncs-ipv4-all'
+        }
+      ],
+      'metadata': {
+        'instance_name_tag': VM_AND_IMAGE_NAME
       }
+    }
   }
   try:
     response = requests.post(CONOHA_API_COMPUTE_SERVICE+'/servers', data=json.dumps(data), headers=headers)
@@ -99,7 +99,7 @@ async def create_vm_from_image(_channel):
   # ipAddress取得
   server_addresses = servers[0]['addresses']
   ip_address = ''
-  for display_nic_key in server_addresses:  # ex: "ext-133-130-48-0-xxx"
+  for display_nic_key in server_addresses: # ex: "ext-133-130-48-0-xxx"
     adresses_ip4_and_ip6 = server_addresses[display_nic_key]
     for address in adresses_ip4_and_ip6:
       if address['version'] == 4:
@@ -137,9 +137,9 @@ async def create_vm_from_image(_channel):
       return None
 
   # ip address表示
-  await utility.post_embed_complite(_channel,
-                                    'Hello Minecraft World!',
-                                    f'ip address: **{ip_address}**')
+  await utility.post_embed_complite(_channel, 
+        'Hello Minecraft World!', 
+        f'ip address: **{ip_address}**')
 
   # image削除完了を待つ
   # await utility.post_message(_channel, '> Removing image...')
@@ -158,8 +158,8 @@ async def create_vm_from_image(_channel):
       return None
     time.sleep(wait_every_time)
 
-  # await utility.post_embed_complite(_channel,
-  #   'complete create vm.',
+  # await utility.post_embed_complite(_channel, 
+  #   'complete create vm.', 
   #   'no problem')
 
 
@@ -193,7 +193,7 @@ async def create_image_from_vm(_channel):
       return None
     headers = {'Accept': 'application/json', 'X-Auth-Token': conoha_api_token}
     data = {
-        'os-stop': None
+      'os-stop': None
     }
     try:
       response = requests.post(CONOHA_API_COMPUTE_SERVICE+'/servers/'+server_id+'/action', data=json.dumps(data), headers=headers)
@@ -236,9 +236,9 @@ async def create_image_from_vm(_channel):
     return None
   headers = {'Accept': 'application/json', 'X-Auth-Token': conoha_api_token}
   data = {
-      'createImage': {
-          'name': VM_AND_IMAGE_NAME
-      }
+    'createImage': {
+      'name': VM_AND_IMAGE_NAME
+    }
   }
   try:
     number_of_trials = 3
@@ -316,6 +316,6 @@ async def create_image_from_vm(_channel):
       return None
     time.sleep(wait_every_time)
 
-  await utility.post_embed_complite(_channel,
-                                    'complete remove vm.',
-                                    'no problem.Thank you!')
+  await utility.post_embed_complite(_channel, 
+    'complete remove vm.', 
+    'no problem.Thank you!')
