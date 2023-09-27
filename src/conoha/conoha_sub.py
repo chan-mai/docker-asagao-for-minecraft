@@ -1,10 +1,7 @@
-import sys
-import time
-import discord
 import requests
 import json
 import conoha_wrap
-import utility
+import utils.utility as utility
 from config import *
 
 

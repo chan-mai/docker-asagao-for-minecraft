@@ -1,12 +1,10 @@
-import sys
 import time
-import discord
 import requests
 import json
 import conoha_wrap
-import utility
+import utils.utility as utility
 from config import *
-import logger_wrap
+import utils.logger_wrap as logger_wrap
 
 logger = logger_wrap.logger(__name__)
 
