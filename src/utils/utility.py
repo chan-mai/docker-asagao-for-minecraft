@@ -95,11 +95,5 @@ async def create_help_embed():
     > ConoHa vm plans list.\n\
     > /plan\n\
     \n\
-    > user id.\n\
-    > /myid\n\
-    \n\
-    > this app version.\n\
-    > /version\n\
-    \n\
   "
   return discord.Embed(title='asagao-for-minecraft help', description=content, color=discord.Color.green())
