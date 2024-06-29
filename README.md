@@ -65,6 +65,7 @@ cp .env.sample .env
 お好きなエディタで`.env`ファイルを開き、下記項目を適切に設定します。  
   
 「CONOHA_API_」から始まる環境変数は[ConoHaの管理画面](https://manage.conoha.jp/API/)から確認できるものです。  
+**注意**現在、ConoHaでは、var3.0がデフォルトですが、非対応のため、コンパネ左下のバージョン切り替えからvar2.0を選択し、た上で表示された情報を使用してください。  
   
 DISCORD_TOKENを設定するとConoHaAPIを使わないコマンドは動くようになります。  
   
